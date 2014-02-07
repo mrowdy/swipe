@@ -1,0 +1,38 @@
+
+body {
+  background-color: #F8F8F8;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.2em;
+  margin: 15px;
+}
+
+h1, p {
+  color: #333;
+}
+
+.swipe {
+  #overflow: hidden;
+  #visibility: hidden;
+  position: relative;
+  width: 600px;
+  margin: 0 auto;
+}
+.swipe-wrap {
+  overflow: hidden;
+  position: relative;
+}
+.swipe-wrap .slide {
+  float:left;
+  width:100%;
+  position: relative;
+}
+
+.slide {
+  background:red;
+}
+
+.slide:nth-child(odd){
+  background: blue;
+}
