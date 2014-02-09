@@ -6,9 +6,10 @@ import 'dart:async';
 
 class Swipe {
   
-  /* options */
   int speed = 300;
-  bool disableScroll = false;   
+  bool disableScroll = false;
+  int minSwipeDistance = 20;
+  int maxSwipeDuration = 250;
   
   Element _container;
   Element _wrapper;
@@ -135,7 +136,7 @@ class Swipe {
     int duration = new DateTime.now().millisecondsSinceEpoch - _time;
 
     bool isValidSlide =
-        ( duration < 250 && _delta.x.abs() > 20 )       
+        ( duration < maxSwipeDuration && _delta.x.abs() > minSwipeDistance )       
         || _delta.x.abs() > _width/2;
         
     bool isPastBounds =
