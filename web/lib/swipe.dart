@@ -2,7 +2,6 @@ library swipe;
 
 import 'dart:html';
 
-part 'vector.dart';
 
 class Swipe {
   Element _container;
@@ -16,8 +15,8 @@ class Swipe {
   int speed = 300;
   bool disableScroll = false;
    
-  Vector _start;
-  Vector _delta;
+  Point _start;
+  Point _delta;
   int _time = 0;
   bool _isScrolling;
   
@@ -117,7 +116,7 @@ class Swipe {
   }
   
   void _startEvent(TouchEvent event){
-    _start = new Vector(event.touches[0].page.x, event.touches[0].page.y);
+    _start = new Point(event.touches[0].page.x, event.touches[0].page.y);
     _time = new DateTime.now().millisecondsSinceEpoch;
     _isScrolling = null;
   }
@@ -168,7 +167,7 @@ class Swipe {
       event.preventDefault();
     };
 
-    _delta =  new Vector(
+    _delta =  new Point(
         event.touches[0].page.x - _start.x, 
         event.touches[0].page.y - _start.y
      );
