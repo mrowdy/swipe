@@ -8,25 +8,64 @@ class Swipe {
   Element _wrapper;
   
   List<Element> _slides = new List<Element>();
-  Map<int, int> slidePos = new Map<int, int>();
-  int width;
-  int get length => _slides.length;
-  int index = 2;
+  Map<int, int> _slidePos = new Map<int, int>();
+
+  //options
+  int startIndex = 0;
   int speed = 300;
   bool disableScroll = false;
    
+  int get length => _slides.length;
+  int get pos => _index;
+  
+  int _width;
+  int _index;
   Point _start;
   Point _delta;
   int _time = 0;
   bool _isScrolling;
-  
   
   Swipe(this._container){
     _setup();
     _handleEvents();
   }
   
-  void _setup(){
+  void prev() {
+    if(_index > 0){
+      slide(_index-1);
+    }
+  }
+
+  void next() {
+    if(_index < length - 1){
+      slide(_index+1);
+    }
+  }
+  
+  void slide(int to, [int slideSpeed = 0]) {
+    
+    if (_index == to){
+      return;
+    }
+
+    int direction = (_index-to).abs() ~/ (_index-to);
+    int diff = (_index-to).abs() - 1;
+    
+    while (diff-- > 0) {
+      _move( _circle((to > _index ? to : _index) - diff - 1), _width * direction, 0);
+    }
+
+    to = _circle(to);
+    
+    int speed = slideSpeed != 0 ? slideSpeed : this.speed;
+    _move(_index, _width * direction, speed);
+    _move(to, 0, speed);
+
+    _index = to;
+  }
+  
+  void _setup() {
+    _index = startIndex;
     _wrapper = _container.children[0];
     
     if(_wrapper == null){
@@ -38,8 +77,8 @@ class Swipe {
       return;
     }
    
-    width = _container.offsetWidth;
-    _wrapper.style.width = '${width * length}px';
+    _width = _container.offsetWidth;
+    _wrapper.style.width = '${_width * length}px';
 
     int pos = length;
     
@@ -47,10 +86,10 @@ class Swipe {
 
       Element slide = _slides[pos];
       
-      slide.style.width = '${width}px';
+      slide.style.width = '${_width}px';
       slide.dataset['index'] = pos.toString();
     
-      _move(pos, index > pos ? -width : (index < pos ? width : 0), 0);
+      _move(pos, _index > pos ? -_width : (_index < pos ? _width : 0), 0);
     }
     
     _container.style.visibility = 'visible';
@@ -59,11 +98,11 @@ class Swipe {
   
   void _move(int index, int dist, int speed) {
     _translate(index, dist, speed);
-    slidePos[index] = dist;
+    _slidePos[index] = dist;
   }
   
   void _translate(int index, int dist, int speed) {
-    if(index < 0 || index > _slides.length - 1){
+    if(index < 0 || index > length - 1){
       return;
     }
     _slides[index].style
@@ -72,56 +111,22 @@ class Swipe {
   }
   
   int _circle(int index){
-    return (_slides.length + (index % _slides.length)) % _slides.length;
+    return (length + (index % length)) % length;
   }
   
-  void prev() {
-    if(index != 0){
-      _slide(index-1);
-    }
-  }
-
-  void next() {
-    if(index < _slides.length - 1){
-      _slide(index-1);
-    }
-  }
-  
-  void _slide(int to, [int slideSpeed = 0]) {
-    
-    if (index == to){
-      return;
-    }
-
-    int direction = (index-to) ~/ (index-to);
-    int diff = (index-to) - 1;
-
-    while (diff-- > 0){
-      _move( _circle((to > index ? to : index) - diff - 1), width * direction, 0);
-    }
-
-    to = _circle(to);
-    
-    int speed = slideSpeed != 0 ? slideSpeed : this.speed;
-    _move(index, width * direction, speed);
-    _move(to, 0, speed);
-
-    index = to;
-  }
-  
-  void _handleEvents(){
+  void _handleEvents() {
     _wrapper.onTouchStart.listen(_startEvent);
     _wrapper.onTouchMove.listen(_moveEvent);
     _wrapper.onTouchEnd.listen(_stopEvent);
   }
   
-  void _startEvent(TouchEvent event){
+  void _startEvent(TouchEvent event) {
     _start = new Point(event.touches[0].page.x, event.touches[0].page.y);
     _time = new DateTime.now().millisecondsSinceEpoch;
     _isScrolling = null;
   }
   
-  void _stopEvent(Event event){
+  void _stopEvent(Event event) {
     if(_delta == null || _isScrolling == true){
       return;
     }
@@ -130,35 +135,35 @@ class Swipe {
 
     bool isValidSlide =
         ( duration < 250 && _delta.x.abs() > 20 )       
-        || _delta.x.abs() > width/2;
+        || _delta.x.abs() > _width/2;
         
     bool isPastBounds =
-        index == 0 && _delta.x > 0
-        || index == _slides.length - 1 && _delta.x < 0;
+        _index == 0 && _delta.x > 0
+        || _index == length - 1 && _delta.x < 0;
             
     bool direction = _delta.x < 0;
     
     if (isValidSlide && !isPastBounds) {
       if (direction) { // slide right
-        _move(index-1, -width, 0);
-        _move(index, slidePos[index]-width, speed);
-        _move(_circle(index+1), slidePos[_circle(index+1)]-width, speed);
-        index = _circle(index+1);
+        _move(_index-1, -_width, 0);
+        _move(_index, _slidePos[_index]-_width, speed);
+        _move(_circle(_index+1), _slidePos[_circle(_index+1)]-_width, speed);
+        _index = _circle(_index+1);
   
       } else {  // slide Left
-        _move(index+1, width, 0);
-        _move(index, slidePos[index]+width, speed);
-        _move(_circle(index-1), slidePos[_circle(index-1)]+width, speed);
-        index = _circle(index-1);
+        _move(_index+1, _width, 0);
+        _move(_index, _slidePos[_index]+_width, speed);
+        _move(_circle(_index-1), _slidePos[_circle(_index-1)]+_width, speed);
+        _index = _circle(_index-1);
       }
     } else {
-      _move(index-1, -width, speed);
-      _move(index, 0, speed);
-      _move(index+1, width, speed);
+      _move(_index-1, -_width, speed);
+      _move(_index, 0, speed);
+      _move(_index+1, _width, speed);
     }
   }
   
-  void _moveEvent(TouchEvent event){
+  void _moveEvent(TouchEvent event) {
     if ( event.touches.length > 1){
       return;
     }
@@ -181,18 +186,20 @@ class Swipe {
     }
    
     event.preventDefault();
-    if((index == 0 && _delta.x > 0)
-       || (index == _slides.length -1 && _delta.x < 0))
+    if((_index == 0 && _delta.x > 0)
+       || (_index == length -1 && _delta.x < 0))
     { 
       return;
     }
     
-    if(index > 0){
-      _translate(index-1, _delta.x + slidePos[index-1], 0);
+    if(_index > 0){
+      _translate(_index-1, _delta.x + _slidePos[_index-1], 0);
     }
-    _translate(index, _delta.x + slidePos[index], 0);
-    if(index < _slides.length - 1){
-      _translate(index+1, _delta.x + slidePos[index+1], 0);
+    
+    _translate(_index, _delta.x + _slidePos[_index], 0);
+    
+    if(_index < length - 1){
+      _translate(_index+1, _delta.x + _slidePos[_index+1], 0);
     }    
   }
 }
