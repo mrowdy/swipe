@@ -117,15 +117,12 @@ class Swipe {
   }
   
   void _startEvent(TouchEvent event){
-    //print('start');
     _start = new Vector(event.touches[0].page.x, event.touches[0].page.y);
     _time = new DateTime.now().millisecondsSinceEpoch;
     _isScrolling = null;
   }
   
   void _stopEvent(Event event){
-    //print('stop');
-    
     if(_delta == null || _isScrolling == true){
       return;
     }
@@ -163,7 +160,6 @@ class Swipe {
   }
   
   void _moveEvent(TouchEvent event){
-    event.preventDefault();
     if ( event.touches.length > 1){
       return;
     }
