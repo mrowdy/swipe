@@ -20,4 +20,12 @@ void main() {
       print(swipe.pos);
     });
   });
+  
+  swipe.onSwipeStart.listen((point){
+    print('swipe start: ${point.toString()}');
+  });
+  
+  swipe.onSwipeEnd.listen((point){
+    print('swipe end: ${point.toString()}');
+  });
 }

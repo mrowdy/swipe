@@ -1,15 +1,17 @@
 library swipe;
 
 import 'dart:html';
+import 'dart:async';
 
 
 class Swipe {
-  Element _container;
-  Element _wrapper;
   
+  /* options */
   int speed = 300;
   bool disableScroll = false;   
   
+  Element _container;
+  Element _wrapper;
   List<Element> _slides = new List<Element>();
   Map<int, int> _slidePos = new Map<int, int>();
   int _width;
@@ -18,9 +20,12 @@ class Swipe {
   Point _delta;
   int _time = 0;
   bool _isScrolling;
+
+  StreamController _onSwipeStart = new StreamController.broadcast();
+  StreamController _onSwipeEnd = new StreamController.broadcast();
+  StreamController _onSlideStart = new StreamController.broadcast();
+  StreamController _onSlideEnd = new StreamController.broadcast();
   
-  int get length => _slides.length;
-  int get pos => _index;
   
   Swipe(this._container, {int index: 0}){
     _index = index;
@@ -119,6 +124,7 @@ class Swipe {
   
   void _startEvent(TouchEvent event) {
     _start = new Point(event.touches[0].page.x, event.touches[0].page.y);
+    _onSwipeStart.add(_start);
     _time = new DateTime.now().millisecondsSinceEpoch;
     _isScrolling = null;
   }
@@ -141,6 +147,7 @@ class Swipe {
     bool direction = _delta.x < 0;
     
     if (isValidSlide && !isPastBounds) {
+      _onSwipeEnd.add(_delta);
       if (direction) { // slide right
         _move(_index-1, -_width, 0);
         _move(_index, _slidePos[_index]-_width, speed);
@@ -199,4 +206,11 @@ class Swipe {
       _translate(_index+1, _delta.x + _slidePos[_index+1], 0);
     }    
   }
+  
+  int get length => _slides.length;
+  int get pos => _index;
+  Stream get onSwipeStart => _onSwipeStart.stream;
+  Stream get onSwipeEnd => _onSwipeEnd.stream;
+  Stream get onSlideStart => _onSlideStart.stream;
+  Stream get onSlideEnd => _onSlideEnd.stream;
 }
