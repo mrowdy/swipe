@@ -7,7 +7,7 @@ void main() {
   Element slider = querySelector('#slider');
   swipe = new Swipe(slider, index: 2);
   swipe.disableScroll = false;
-  swipe.speed = 200;
+  swipe.speed = 300;
   
   querySelector('#next').onClick.listen((_) => swipe.next());
   querySelector('#prev').onClick.listen((_) => swipe.prev());
@@ -21,11 +21,15 @@ void main() {
     });
   });
   
-  swipe.onSwipeStart.listen((point){
-    print('swipe start: ${point.toString()}');
+  swipe.onSwipe.listen((point){
+    print('swipe end: ${point.toString()}');
   });
   
-  swipe.onSwipeEnd.listen((point){
-    print('swipe end: ${point.toString()}');
+  swipe.onSlideStart.listen((index){
+    print('slide start with index: $index');
+  });
+  
+  swipe.onSlideEnd.listen((index){
+    print('slide end with index: $index');
   });
 }

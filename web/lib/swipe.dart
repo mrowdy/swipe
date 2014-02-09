@@ -21,8 +21,7 @@ class Swipe {
   int _time = 0;
   bool _isScrolling;
 
-  StreamController _onSwipeStart = new StreamController.broadcast();
-  StreamController _onSwipeEnd = new StreamController.broadcast();
+  StreamController _onSwipe = new StreamController.broadcast();
   StreamController _onSlideStart = new StreamController.broadcast();
   StreamController _onSlideEnd = new StreamController.broadcast();
   
@@ -124,7 +123,6 @@ class Swipe {
   
   void _startEvent(TouchEvent event) {
     _start = new Point(event.touches[0].page.x, event.touches[0].page.y);
-    _onSwipeStart.add(_start);
     _time = new DateTime.now().millisecondsSinceEpoch;
     _isScrolling = null;
   }
@@ -147,7 +145,8 @@ class Swipe {
     bool direction = _delta.x < 0;
     
     if (isValidSlide && !isPastBounds) {
-      _onSwipeEnd.add(_delta);
+      _onSwipe.add(_delta);
+      _onSlideStart.add(_index);
       if (direction) { // slide right
         _move(_index-1, -_width, 0);
         _move(_index, _slidePos[_index]-_width, speed);
@@ -160,6 +159,7 @@ class Swipe {
         _move(_circle(_index-1), _slidePos[_circle(_index-1)]+_width, speed);
         _index = _circle(_index-1);
       }
+      Future future = new Future.delayed(new Duration(milliseconds: speed), () => _onSlideEnd.add(_index));
     } else {
       _move(_index-1, -_width, speed);
       _move(_index, 0, speed);
@@ -209,8 +209,7 @@ class Swipe {
   
   int get length => _slides.length;
   int get pos => _index;
-  Stream get onSwipeStart => _onSwipeStart.stream;
-  Stream get onSwipeEnd => _onSwipeEnd.stream;
+  Stream get onSwipe => _onSwipe.stream;
   Stream get onSlideStart => _onSlideStart.stream;
   Stream get onSlideEnd => _onSlideEnd.stream;
 }
