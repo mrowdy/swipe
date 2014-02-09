@@ -7,25 +7,23 @@ class Swipe {
   Element _container;
   Element _wrapper;
   
+  int speed = 300;
+  bool disableScroll = false;   
+  
   List<Element> _slides = new List<Element>();
   Map<int, int> _slidePos = new Map<int, int>();
-
-  //options
-  int startIndex = 0;
-  int speed = 300;
-  bool disableScroll = false;
-   
-  int get length => _slides.length;
-  int get pos => _index;
-  
   int _width;
-  int _index;
+  int _index = 0;
   Point _start;
   Point _delta;
   int _time = 0;
   bool _isScrolling;
   
-  Swipe(this._container){
+  int get length => _slides.length;
+  int get pos => _index;
+  
+  Swipe(this._container, {int index: 0}){
+    _index = index;
     _setup();
     _handleEvents();
   }
@@ -65,7 +63,6 @@ class Swipe {
   }
   
   void _setup() {
-    _index = startIndex;
     _wrapper = _container.children[0];
     
     if(_wrapper == null){
