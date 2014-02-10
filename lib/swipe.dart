@@ -91,12 +91,13 @@ class Swipe {
   int get length => _slides.length;
   
   /**
-   * return current slide position
+   * returns current slide position
    */
   int get pos => _index;
   
   /**
    * Fires when a swipe is detected
+   * returns delta of swipe movement as [Point]
    */
   Stream get onSwipe => _onSwipe.stream;
   
