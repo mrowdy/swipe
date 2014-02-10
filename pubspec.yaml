@@ -1,6 +1,7 @@
 name: Swipe
-description: A sample web application
+description: A swipe class for mobile navigation or slideshows.
+author: Slemgrim
+url: https://github.com/Slemgrim/swipe
+version: 1.0.0
 dependencies:
   browser: any
-  swipe:
-    path: lib
