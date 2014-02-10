@@ -3,13 +3,18 @@ library swipe;
 import 'dart:html';
 import 'dart:async';
 
-
+/**
+ * A swipe class for mobile navigation or slideshows.
+ */
 class Swipe {
   
-  int speed = 300;
-  bool disableScroll = false;
-  int minSwipeDistance = 20;
-  int maxSwipeDuration = 250;
+  /**
+   * Options
+   */
+  int speed = 300;            // Animation Speed
+  bool disableScroll = false; // Disable Scrolling on slides
+  int minSwipeDistance = 20;  // Minimal distance to trigger swipe
+  int maxSwipeDuration = 250; // Maximum time to trigger swipe
   
   Element _container;
   Element _wrapper;
@@ -26,25 +31,38 @@ class Swipe {
   StreamController _onSlideStart = new StreamController.broadcast();
   StreamController _onSlideEnd = new StreamController.broadcast();
   
-  
+  /**
+   * [_container] contains the wrapper for the slides. 
+   * [index] is the initial starting positon of the slides
+   */
   Swipe(this._container, {int index: 0}){
     _index = index;
     _setup();
     _handleEvents();
   }
   
+  /**
+   * Manually slide to the left
+   */
   void prev() {
     if(_index > 0){
       slide(_index-1);
     }
   }
-
+  
+  /**
+   * Manually slide to the right
+   */
   void next() {
     if(_index < length - 1){
       slide(_index+1);
     }
   }
   
+  /**
+   * Manually slide to position [to]
+   * Use [slideSpeed] if you don't want default speed
+   */
   void slide(int to, [int slideSpeed = 0]) {
     
     if (_index == to){
@@ -66,6 +84,33 @@ class Swipe {
 
     _index = to;
   }
+  
+  /**
+   * returns amount of slides
+   */
+  int get length => _slides.length;
+  
+  /**
+   * return current slide position
+   */
+  int get pos => _index;
+  
+  /**
+   * Fires when a swipe is detected
+   */
+  Stream get onSwipe => _onSwipe.stream;
+  
+  /**
+   * Fires when the slide animation starts
+   * returns index of current slide
+   */
+  Stream get onSlideStart => _onSlideStart.stream;
+  
+  /**
+   * Fires when the slide animation stops
+   * returns index of slide after animation
+   */
+  Stream get onSlideEnd => _onSlideEnd.stream;
   
   void _setup() {
     _wrapper = _container.children[0];
@@ -207,10 +252,4 @@ class Swipe {
       _translate(_index+1, _delta.x + _slidePos[_index+1], 0);
     }    
   }
-  
-  int get length => _slides.length;
-  int get pos => _index;
-  Stream get onSwipe => _onSwipe.stream;
-  Stream get onSlideStart => _onSlideStart.stream;
-  Stream get onSlideEnd => _onSlideEnd.stream;
 }
